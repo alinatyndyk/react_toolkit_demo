@@ -15,6 +15,7 @@ const Cars = () => {
     return (
         <div>
             {cars.map(car => <Car key={car.id} car={car}/>)}
+            hello
         </div>
     );
 };
