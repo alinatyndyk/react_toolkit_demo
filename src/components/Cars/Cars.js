@@ -10,12 +10,11 @@ const Cars = () => {
     const dispatch = useDispatch()
     useEffect(()=>{
         dispatch(carActions.getAll())
-    })
+    },[])
 
     return (
         <div>
             {cars.map(car => <Car key={car.id} car={car}/>)}
-            hello
         </div>
     );
 };
