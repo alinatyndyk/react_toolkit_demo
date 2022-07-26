@@ -4,19 +4,18 @@ import {carService} from "../../services";
 
 
 const initialState = {
-    cars:[],
-    carForUpdate:null,
+    cars: [],
+    carForUpdate: null,
     errors: null
 }
 
 const getAll = createAsyncThunk(
     'carSlice/getAll',
-    async (_,{rejectWithValue})=>{
+    async (_, {rejectWithValue}) => {
         try {
-        const {data} = await carService.getAll();
-        return data
-        }
-        catch (e){
+            const {data} = await carService.getAll();
+            return data
+        } catch (e) {
             return rejectWithValue(e.response.data)
         }
     }
@@ -24,7 +23,7 @@ const getAll = createAsyncThunk(
 
 const updateById = createAsyncThunk(
     'carSlice/updateById',
-    async ({id, car})=>{
+    async ({id, car}) => {
         const {data} = await carService.updateBYId(id, car)
         return data
     }
@@ -33,39 +32,54 @@ const updateById = createAsyncThunk(
 
 const create = createAsyncThunk(
     'create',
-    async ({car})=>{
-       const {data} = await carService.create(car)
+    async ({car}) => {
+        const {data} = await carService.create(car)
         return data
     }
 )
 
+const deleteCar = createAsyncThunk(
+    'delete',
+    async ({id, car}) =>{
+        const {data} = await carService.deleteById(id, car)
+        return data
+    }
+)
 
 const carSlice = createSlice({
     name: 'carSlice',
     initialState,
-    reducers:{
-        setCarForUpdate:(state, action)=>{
+    reducers: {
+        setCarForUpdate: (state, action) => {
             state.carForUpdate = action.payload
         }
     },
-    extraReducers:(builder)=>
+    extraReducers: (builder) =>
         builder
-            .addCase(getAll.fulfilled, (state, action)=>{
+            .addCase(getAll.fulfilled, (state, action) => {
                 state.cars = action.payload
                 state.errors = null
             })
-            .addCase(getAll.rejected, (state, action) =>{
+            .addCase(getAll.rejected, (state, action) => {
                 state.errors = action.payload
             })
-            .addCase(updateById.fulfilled, (state, action)=>{
-                const currentCar = state.cars.find(value=> value.id===action.payload.id)
+            .addCase(updateById.fulfilled, (state, action) => {
+                const currentCar = state.cars.find(value => value.id === action.payload.id)
                 Object.assign(currentCar, action.payload);
                 state.carForUpdate = null
             })
-            .addCase(create.fulfilled, (state, action)=>{
+            .addCase(create.fulfilled, (state, action) => {
                 state.cars.push(action.payload)
             })
-            .addCase(create.rejected, (state, action)=>{
+            .addCase(create.rejected, (state, action) => {
+                console.log('error')
+            })
+            .addCase(deleteCar.fulfilled, (state, action)=>{
+                const index = state.cars.findIndex(car=>car.id === action.payload)
+                state.cars.splice(index,1)
+                console.log(action.payload);
+            })
+            .addCase(deleteCar.rejected, (state, action)=>{
                 console.log('error')
             })
 })
@@ -76,7 +90,8 @@ const carActions = {
     getAll,
     setCarForUpdate,
     updateById,
-    create
+    create,
+    deleteCar
 }
 
 export {
